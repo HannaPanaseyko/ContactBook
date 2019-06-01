@@ -100,8 +100,6 @@ public class ContactServiceImpl implements ContactService{
         }
     }
 
-
-
     @Override
     public void deleteContactById(Scanner scanner) throws AddressBookException {
 
