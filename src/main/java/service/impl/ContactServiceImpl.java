@@ -147,7 +147,7 @@ public class ContactServiceImpl implements ContactService {
 
     private void showFieldToModifier() {
         System.out.println("1.Name");
-        System.out.println("2.Sur name");
+        System.out.println("2.Surname");
         System.out.println("3.Phone number");
     }
 
