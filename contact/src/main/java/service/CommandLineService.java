@@ -4,6 +4,8 @@ import entity.Contact;
 import exception.AddressBookException;
 import exception.ResponseCode;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Scanner;
 
 public interface CommandLineService {
@@ -27,35 +29,34 @@ public interface CommandLineService {
     /**
      * Endpoint for begin our program.
      *
-     * @param scanner scanner of console input
+     * @param reader receive console input
      * @param service service that works with dao layer.
      */
-    static void run(Scanner scanner, ContactService service) {
+    static void run(BufferedReader reader, ContactService service) {
+        int numberOfMenu;
         boolean exit = false;
         do {
+            System.out.println("Choose your wish: ");
+            showMenu();
             try {
-                System.out.println("Choose your wish: ");
-                showMenu();
-                if (scanner.hasNextInt()) {
-                    switch (scanner.nextInt()) {
+                String string = reader.readLine();
+                if (isCorrectInteger(string)) {
+                    numberOfMenu = Integer.parseInt(string);
+                    switch (numberOfMenu) {
                         case 1: {
-                            service.addContact(scanner);
+                            service.addContact(reader);
                             break;
                         }
                         case 2: {
-                            service.updateContactById(scanner);
+                            service.updateContactById(reader);
                             break;
                         }
                         case 3: {
-                            service.deleteContactById(scanner);
+                            service.deleteContactById(reader);
                             break;
                         }
                         case 4: {
                             service.showContacts();
-                            break;
-                        }
-                        case 5: {
-                            System.out.println(service.getContact(scanner));
                             break;
                         }
                         case 0: {
@@ -70,12 +71,31 @@ public interface CommandLineService {
                     }
                 } else {
                     System.out.println("You entered a wrong number");
-                    scanner.next();
                 }
 
         } catch(AddressBookException e){
             System.out.println(e.getMessage());
-        }
-    } while (!exit);
+        } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } while (!exit);
 }
+    static boolean isCorrectInteger(String str) {
+        try {
+            Integer.parseInt(str);
+        } catch (NumberFormatException | NullPointerException e) {
+            System.out.println(ResponseCode.WRONG_DATA_TYPE);
+            return false;
+        }
+        return true;
+    }
+    static boolean isCorrectDouble(String str) {
+        try {
+            Double.parseDouble(str);
+        } catch (NumberFormatException | NullPointerException e) {
+            System.out.println(ResponseCode.WRONG_DATA_TYPE);
+            return false;
+        }
+        return true;
+    }
 }

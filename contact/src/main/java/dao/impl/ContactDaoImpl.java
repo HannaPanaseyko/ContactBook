@@ -4,163 +4,102 @@ import dao.ContactDao;
 import entity.Contact;
 import exception.AddressBookException;
 import exception.ResponseCode;
-import org.omg.CORBA.portable.ApplicationException;
 
-import java.lang.reflect.Array;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class ContactDaoImpl implements ContactDao {
   //  private static final Scanner searchID = new Scanner(System.in);
 
     private static int generator = 0;
-    private Contact[] store = new Contact[7];
 
     public ContactDaoImpl() {
 
     }
-   // private List<Contact> store = new ArrayList<>();
+    public Set<Contact> store = new TreeSet<>(Comparator.comparing(Contact::getName)
+            .thenComparing(Contact::getSurName)
+            .thenComparing(Contact::getPhoneNumber));
 
     public void saveContact(Contact contact) throws AddressBookException {
         searchSameContact(contact);
         //contact.setId(store.size() + 1);
-        for (int argument = 0; argument <= store.length; argument++){
-            if(Objects.isNull(store[argument])){
-                generator = argument;
-                contact.setId(++generator);
-                store[argument] = contact;
-                System.out.println("This contact was added into your contact book");
-                System.out.println(contact.toString());
-                break;
-            }
-        }
+        generator++;
+        contact.setId(generator);
+        contact.setCreateDate(LocalDateTime.now());
+        store.add(contact);
 
-        //generator++;
-        //contact.setId(generator);
-        //store.add(contact);
-        //System.out.println("This contact was - = -");
-        //System.out.println(contact.toString());
+        System.out.println("This contact was added into your contact book");
+        System.out.println(contact.toString());
     }
 
     @Override
-    public Contact updateContactById(int contactId)
-    {
-       // store.set(contact.getId()-1, contact);
-       // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
-       // return contact;
+    public Contact updateContactById(int contactId) throws AddressBookException {
 
-        Contact contactStore = null;
-        for (Contact storeElement : store) {
-            if (Objects.equals(storeElement.getId(), contactId)){
-                 contactStore = storeElement;
-            break;
-            }
-        }
-        return contactStore;
+            // store.set(contact.getId()-1, contact);
+            // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
+            // return contact;
+            return Optional.of(store
+            .stream()
+            .filter(storeElement -> storeElement.getId() == contactId)
+            .findFirst())
+            .get()
+            .orElseThrow(() -> new AddressBookException(ResponseCode.NOT_FOUND));
     }
 
     @Override
-    public void showContacts() {
-        for(Contact contactStore : store){
-            if(Objects.nonNull(contactStore)){
-                System.out.println(contactStore);
-            }
-        }
+    public void showContacts(){
+        store
+                .stream()
+                .sorted(Comparator.comparing(Contact::getId))
+                .forEach(System.out::println);
     }
+
+
     @Override
     public void deleteContactById(int contactId) throws AddressBookException {
-        if (idExists(contactId)){
-            throw new AddressBookException(ResponseCode.NO_CONTENT);
+        {
+            store
+                    .removeIf(contact -> contact.getId() == contactId);
         }
-        for(int parameter = 0; parameter < store.length; parameter++){
-            if (store[parameter].getId() == contactId){
-                store[parameter] = null;
-                break;
-            }
+    }
 
-        }
-       // store.forEach(item -> {
-       //     if(item.getId())
-       // })
+    @Override
+    public Contact getContactByName(String name) throws AddressBookException {
+        return Optional.of(store
+                .stream()
+                .filter(contactStore -> contactStore.toString() == name)
+                .findFirst())
+                .get()
+                .orElseThrow(() -> new AddressBookException(ResponseCode.NOT_FOUND));
     }
 
     @Override
     public Contact getContactById(int contactId) throws AddressBookException{
-            if(idExists(contactId)) {
-                throw new AddressBookException(ResponseCode.NO_CONTENT);
-            }
-
-            for (Contact storeContacts : getStore()) {
-                if(storeContacts.getId() == contactId) {
-                    return storeContacts;
-                }
-            }
-            return null;
-    }
-    @Override
-    public Contact getContactByName(String name) {
-        for (Contact storeElement : store) {
-            if (Objects.equals(storeElement.getName().toLowerCase(), name.toLowerCase())) {
-                return storeElement;
-            }
-        }
-        return null;
+            return Optional.of(store.stream()
+            .filter(storeContact -> storeContact.getId() == contactId)
+            .findFirst())
+            .get()
+            .orElseThrow(() -> new AddressBookException(ResponseCode.NOT_FOUND));
     }
 
-    @Override
-    public void deleteContactByEntity(Contact contact) {
-        for (int parameter = 0; parameter < store.length; parameter++) {
-            if (store[parameter].equals(contact)) {
-                store[parameter] = null;
-                break;
-            }
-        }
-    }
 
-    public Contact[] getStore(){
+    public Set getStore(){
         return store;
     }
 
     private void searchSameContact(Contact contact) throws AddressBookException {
-        for (Contact contactFromStore : getStore()) {
-            if (Objects.nonNull(contactFromStore)
-                    && contact.getName().equals(contactFromStore.getName())
-                    && contact.getPhoneNumber().equals(contactFromStore.getPhoneNumber())
-                    && contact.getSurName().equals(contactFromStore.getSurName())) {
+        if (store
+                .stream()
+                .anyMatch(contact::equals)) {
                 throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-                        "This contact was added early");
+                        "This contact was added earlier");
             }
         }
-    }
 
-
-    //private void searchSameContact(Contact contact) throws AddressBookException{
-    //    for (Contact contactFromStore : getStore()){
-    //        if(Objects.nonNull(contactFromStore)
-    //                && contact.getName().equals(contact1.getName())
-    //                && contact.getPhoneNumber().equals(contact1.getPhoneNumber())
-    //                && contact.getSurName().equals(contact1.getSurName())){
-    //            throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-    //                    "This contact was added early");
-    //        }
-    //
-    //    }
-
-    public boolean idExists(int contactId) {
-        for(Contact contact : getStore()){
-            if (Objects.nonNull(contact)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean emptyStore(){
-        for(Contact contact : getStore()){
-            if (Objects.nonNull(contact)){
-                return false;
-            }
-        }
-        return true;
+    public boolean isExists(int id){
+        return store
+                .stream()
+                .anyMatch(contact -> contact.getId() == id);
     }
 
 
