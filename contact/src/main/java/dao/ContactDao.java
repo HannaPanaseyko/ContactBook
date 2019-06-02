@@ -40,14 +40,7 @@ public interface ContactDao {
      * @param id id of contact
      */
     void deleteContactById(int id) throws AddressBookException;
-
-    /**
-     * Delete contact by entity.
-     *
-     * @param contact contact that will be deleted
-     */
-   // void deleteContactByEntity(Contact contact) throws AddressBookException;
-
+    
     /**
      * Search contact by name.
      *
