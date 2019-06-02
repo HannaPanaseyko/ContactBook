@@ -9,7 +9,6 @@ import service.CommandLineService;
 import java.sql.*;
 
 public class ContactDaoImpl extends DB implements ContactDao, CommandLineService {
-  //  private static final Scanner searchID = new Scanner(System.in);
 
     private Connection connection = DB.getConnect();
     private static int generator = 0;
