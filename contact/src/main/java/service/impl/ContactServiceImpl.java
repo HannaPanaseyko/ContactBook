@@ -29,13 +29,11 @@ public class ContactServiceImpl implements ContactService{
         contact.setSurName(surName);
 
         System.out.println("Please enter your contact`s phone number");
-        String phoneNumber = scanner.next().replaceAll("[^0-9+]", ""); //заменяем символы, которые
-        //не находятся между 0 и 9 и плюсом на пустоту(удаляем)
+        String phoneNumber = scanner.next().replaceAll("[^0-9+]", ""); 
         contact.setPhoneNumber(phoneNumber);
 
         contactDaoImpl.saveContact(contact);
         System.out.println("We are thankful that you saved your contact in our contact book app");
-        //return contact;
         return contact;
     }
 
@@ -52,8 +50,6 @@ public class ContactServiceImpl implements ContactService{
             }
         }
         throw new AddressBookException(ResponseCode.SERVER_ERROR, "Please enter a number");
-       // int id = scanner.nextInt();
-        // return contactDao.getContactById(id);
     }
     @Override
     public void updateContactById(Scanner scanner) throws AddressBookException {
@@ -131,6 +127,13 @@ public class ContactServiceImpl implements ContactService{
         }
     }
 
+    
+    
+    
+    
+    
+    
+    
     //@Override
    //public Contact updateContactById(Scanner scanner) throws AddressBookException {
    //   // Contact contact = new Contact();
