@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class ContactDaoImpl implements ContactDao {
-  //  private static final Scanner searchID = new Scanner(System.in);
 
     private static int generator = 0;
 
@@ -24,7 +23,6 @@ public class ContactDaoImpl implements ContactDao {
 
     public void saveContact(Contact contact) throws AddressBookException {
         searchSameContact(contact);
-        //contact.setId(store.size() + 1);
         generator++;
         contact.setId(generator);
         store.add(contact);
@@ -35,10 +33,6 @@ public class ContactDaoImpl implements ContactDao {
     @Override
     public Contact updateContactById(int contactId)
     {
-       // store.set(contact.getId()-1, contact);
-       // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
-       // return contact;
-
         Contact contactStore = null;
         for (Contact storeElement : store) {
             if (Objects.equals(storeElement.getId(), contactId)){
@@ -70,9 +64,6 @@ public class ContactDaoImpl implements ContactDao {
                 break;
             }
         }
-       // store.forEach(item -> {
-       //     if(item.getId())
-       // })
     }
 
     @Override
@@ -123,19 +114,6 @@ public class ContactDaoImpl implements ContactDao {
             }
         }
     }
-
-
-    //private void searchSameContact(Contact contact) throws AddressBookException{
-    //    for (Contact contactFromStore : getStore()){
-    //        if(Objects.nonNull(contactFromStore)
-    //                && contact.getName().equals(contact1.getName())
-    //                && contact.getPhoneNumber().equals(contact1.getPhoneNumber())
-    //                && contact.getSurName().equals(contact1.getSurName())){
-    //            throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-    //                    "This contact was added early");
-    //        }
-    //
-    //    }
 
     public boolean idExists(int contactId) {
         for(Contact storeContacts : getStore()){
