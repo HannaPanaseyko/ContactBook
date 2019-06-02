@@ -281,9 +281,9 @@ public class ContactServiceImpl extends CommandLineServiceImpl implements Contac
 
     void checkAndCreateDir() {
         if (new File(SET_PATH).mkdirs()) {
-            System.out.println("create dir");
+            System.out.println("CREATE DIR");
         } else {
-            System.out.println("dir exist");
+            System.out.println("DIR EXISTS");
         }
     }
 }
