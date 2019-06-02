@@ -34,8 +34,7 @@ public class ContactServiceImpl implements ContactService {
         contact.setSurName(surName);
 
         System.out.println("Please enter your contact`s phone number");
-        String phoneNumber = scanner.next().replaceAll("[^0-9+]", ""); //заменяем символы, которые
-        //не находяться между 0 и 9 и плюсом на пустоту(удаляем)
+        String phoneNumber = scanner.next().replaceAll("[^0-9+]", ""); 
         contact.setPhoneNumber(phoneNumber);
 
         contactDaoImpl.saveContact(contact);
@@ -56,33 +55,10 @@ public class ContactServiceImpl implements ContactService {
             }
         }
         throw new AddressBookException(ResponseCode.SERVER_ERROR, "Please enter a number");
-       // int id = scanner.nextInt();
-        // return contactDao.getContactById(id);
     }
 
     @Override
     public Contact updateContactById(Scanner scanner) throws AddressBookException {
-       // Contact contact = new Contact();
-       // if (Objects.isNull(getContact(scanner))) {
-       //     contact = getContactByName(scanner);
-       //     if (Objects.isNull(contact)) {
-       //         System.out.println("Contact not found");
-       //         System.out.println("Maybe you want to create rhis contact?\n1.Yes\n2.No");
-       //         if (scanner.hasNextInt()) {
-       //             int choosing = scanner.nextInt();
-       //             if (choosing == 1) {
-       //                 return addContact(scanner);
-       //             } else {
-       //                 return null;
-       //             }
-       //         }else {
-       //             System.out.println("Please enter a number");
-       //             scanner.next();
-       //         }
-       //
-       //     }
-       // }
-
         Contact contact = null;
         if(scanner.hasNextInt()){
             contact = getContactByName(scanner);
@@ -101,8 +77,6 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public void deleteContactById(Scanner scanner) throws AddressBookException {
         System.out.println("Enter number of contact that will be deleted:");
-
-        //contactDao.deleteContactById(scanner.nextInt());
         if(scanner.hasNextInt()){
             contactDao.deleteContactById(scanner.nextInt());
         } else {
