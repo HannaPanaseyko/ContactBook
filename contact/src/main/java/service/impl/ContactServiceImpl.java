@@ -116,7 +116,6 @@ public class ContactServiceImpl extends CommandLineServiceImpl implements Contac
             System.out.println("0 - Done");
             String string = reader.readLine();
             if (CommandLineService.isCorrectInteger(string)) {
-              //  String stringUpdate = reader.readLine();
                 int number = Integer.parseInt(string);
                 switch (number) {
                     case ContactService.NAME: {
