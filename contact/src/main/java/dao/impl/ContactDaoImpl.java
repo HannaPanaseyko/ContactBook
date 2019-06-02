@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class ContactDaoImpl implements ContactDao {
-  //  private static final Scanner searchID = new Scanner(System.in);
 
     private static int generator = 0;
 
@@ -22,7 +21,6 @@ public class ContactDaoImpl implements ContactDao {
 
     public void saveContact(Contact contact) throws AddressBookException {
         searchSameContact(contact);
-        //contact.setId(store.size() + 1);
         generator++;
         contact.setId(generator);
         contact.setCreateDate(LocalDateTime.now());
@@ -34,10 +32,6 @@ public class ContactDaoImpl implements ContactDao {
 
     @Override
     public Contact updateContactById(int contactId) throws AddressBookException {
-
-            // store.set(contact.getId()-1, contact);
-            // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
-            // return contact;
             return Optional.of(store
             .stream()
             .filter(storeElement -> storeElement.getId() == contactId)
@@ -58,8 +52,7 @@ public class ContactDaoImpl implements ContactDao {
     @Override
     public void deleteContactById(int contactId) throws AddressBookException {
         {
-            store
-                    .removeIf(contact -> contact.getId() == contactId);
+            store.removeIf(contact -> contact.getId() == contactId);
         }
     }
 
@@ -81,8 +74,6 @@ public class ContactDaoImpl implements ContactDao {
             .get()
             .orElseThrow(() -> new AddressBookException(ResponseCode.NOT_FOUND));
     }
-
-
     public Set getStore(){
         return store;
     }
