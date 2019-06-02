@@ -16,7 +16,6 @@ public interface CommandLineService {
      */
 
     static void showMenu() {
-        //выводит взаимодействия
         System.out.println("1.Add contact.");
         System.out.println("2.Update contact.");
         System.out.println("3.Delete contact.");
