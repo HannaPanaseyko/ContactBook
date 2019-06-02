@@ -11,11 +11,7 @@ public interface CommandLineService {
      * Method that shows items of the menu.
      */
 
-    // static final Scanner scanner = new Scanner(System.in);
-
-    //static final ContactServiceImpl service = new ContactServiceImpl(new ContactDaoImpl());
     static void showMenu() {
-        //выводит взаимодействия
         System.out.println("1.Add contact.");
         System.out.println("2.Update contact.");
         System.out.println("3.Delete contact.");
