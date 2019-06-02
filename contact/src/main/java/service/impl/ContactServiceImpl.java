@@ -100,8 +100,6 @@ public class ContactServiceImpl implements ContactService{
         }
     }
 
-
-
     @Override
     public void deleteContactById(Scanner scanner) throws AddressBookException {
 
@@ -121,17 +119,7 @@ public class ContactServiceImpl implements ContactService{
         contactDaoImpl.showContacts();
     }
 
-    @Override
-    public void deleteContactByEntity(Scanner scanner) throws AddressBookException {
-        if (contactDaoImpl.emptyStore()) {
-            throw new AddressBookException(ResponseCode.NO_CONTENT);
 
-        } else {
-            contactDaoImpl.showContacts();
-            System.out.println("Enter number of contact that will be deleted:");
-            contactDaoImpl.deleteContactByEntity(getContact(scanner));
-        }
-    }
 
     //@Override
    //public Contact updateContactById(Scanner scanner) throws AddressBookException {

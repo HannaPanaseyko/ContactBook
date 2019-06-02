@@ -56,12 +56,5 @@ public interface ContactService {
      * Show all contacts.
      */
     void showContacts();
-
-    /**
-     * Delete contact by entity.
-     *
-     * @param scanner scanner of console input.
-     */
-    void deleteContactByEntity(Scanner scanner) throws AddressBookException;
 }
 
