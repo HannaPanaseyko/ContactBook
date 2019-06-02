@@ -22,17 +22,17 @@ public interface ContactDao {
     Contact getContactById(int contactId) throws AddressBookException;
 
     /**
-            * Update contact in your store.
+     * Update contact in your store.
      *
-             * @param contactId contact
+     * @param contact contact
      * @return updated contact
      */
-    Contact updateContactById(int contactId);
+    void updateContactById(Contact contact) throws AddressBookException;
 
     /**
      * Show all contacts.
      */
-    void showContacts();
+    void showContacts() throws AddressBookException;
 
     /**
      * Delete contact by id.
@@ -46,15 +46,5 @@ public interface ContactDao {
      *
      * @param contact contact that will be deleted
      */
-    void deleteContactByEntity(Contact contact) throws AddressBookException;
-
-    /**
-     * Search contact by name.
-     *
-     * @param name name of contact
-     * @return contact
-     */
-    Contact getContactByName(String name) throws AddressBookException;
-
 
 }

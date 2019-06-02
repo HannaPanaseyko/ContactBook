@@ -5,115 +5,195 @@ import dao.impl.ContactDaoImpl;
 import entity.Contact;
 import exception.AddressBookException;
 import exception.ResponseCode;
+import service.CommandLineService;
 import service.ContactService;
 
-import java.util.Scanner;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.Set;
 
-public class ContactServiceImpl implements ContactService{
+public class ContactServiceImpl extends CommandLineServiceImpl implements ContactService {
 
+    private static final String ID = "ID: ";
+    private static final String NAME = "Name: ";
+    private static final String SUR_NAME = "Surname: ";
+    private static final String PHONE_NUMBER = "Phone Number: ";
+    private static final String AGE = "Age: ";
+    private static final String HEIGHT = "Height: ";
+    private static final String MARITAL_STATUS = "Marital status: ";
+    private static final String CREATE_DATE = "Create date: ";
+    private static final String WORD_SEPARATOR = "; ";
+    private static final String SET_PATH = "./backup/";
+    private static final String FILE_NAME = "contacts_" +
+            LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) + ".txt";
     private ContactDaoImpl contactDaoImpl;
-    public ContactServiceImpl(ContactDao contactDao) {
+
+    ContactServiceImpl(ContactDao contactDao) {
         this.contactDaoImpl = (ContactDaoImpl) contactDao;
     }
+
     @Override
-    public Contact addContact(Scanner scanner) throws AddressBookException {
+    public void addContact(BufferedReader reader) throws IOException {
 
         Contact contact = new Contact();
 
         System.out.println("Please enter your contact`s name");
-        String name = scanner.next();
+        String name = reader.readLine();
         contact.setName(name);
 
         System.out.println("Please enter your contact`s surname");
-        String surName = scanner.next();
+        String surName = reader.readLine();
         contact.setSurName(surName);
 
         System.out.println("Please enter your contact`s phone number");
-        String phoneNumber = scanner.next().replaceAll("[^0-9+]", ""); //заменяем символы, которые
+        String phoneNumber = reader.readLine().replaceAll("[^0-9+]", ""); //заменяем символы, которые
         //не находятся между 0 и 9 и плюсом на пустоту(удаляем)
         contact.setPhoneNumber(phoneNumber);
 
+
+        System.out.println("Please enter your contact's age");
+        String stringAge = reader.readLine();
+        if (CommandLineService.isCorrectInteger(stringAge)) {
+            int age = Integer.parseInt(stringAge);
+            contact.setAge(age);
+        }
+
+        System.out.println("Please enter you contact's height");
+        String stringHeight = reader.readLine();
+        if (CommandLineService.isCorrectDouble(stringHeight)) {
+            double height = Double.parseDouble(stringHeight);
+            contact.setHeight(height);
+        }
+
+        System.out.println("Is your marital status married?");
+        System.out.println("1 - Single");
+        System.out.println("2 - Married");
+        boolean maritalStatus;
+        String enterString = null;
+        enterString = reader.readLine();
+        if (enterString.equals("1")) {
+            maritalStatus = false;
+        } else {
+            maritalStatus = true;
+        }
+        contact.setMaritalStatus(maritalStatus);
         contactDaoImpl.saveContact(contact);
         System.out.println("We are thankful that you saved your contact in our contact book app");
-        //return contact;
-        return contact;
+
     }
 
     @Override
-    public Contact getContact(Scanner scanner) throws AddressBookException{
-        System.out.println("Please enter number of contact in your address book");
-        if(scanner.hasNext()){
-            if(scanner.hasNextInt()){
-                int id = scanner.nextInt();
-                return contactDaoImpl.getContactById(id);
-            } else{
-                System.out.println("Please enter a number");
-                scanner.next();
-            }
+    public Contact updateContactById(BufferedReader reader) throws AddressBookException, IOException {
+        contactDaoImpl.showContacts();
+        System.out.println("Enter please contacts ID what you want update");
+        String string = reader.readLine();
+        if (CommandLineService.isCorrectInteger(string)) {
+            int index = Integer.parseInt(string);
+            Contact contact = contactDaoImpl.getContactById(index);
+            editContact(reader, contact);
+            contactDaoImpl.updateContactById(contact);
         }
-        throw new AddressBookException(ResponseCode.SERVER_ERROR, "Please enter a number");
-       // int id = scanner.nextInt();
-        // return contactDao.getContactById(id);
+        throw new AddressBookException(ResponseCode.NO_CONTENT);
     }
-    @Override
-    public void updateContactById(Scanner scanner) throws AddressBookException {
-        if (contactDaoImpl.emptyStore()) {
-            throw new AddressBookException(ResponseCode.NOT_FOUND);
-        } else {
-            contactDaoImpl.showContacts();
-            System.out.println("Enter please contacts ID what you want update");
-            int contactId = scanner.nextInt();
-            Contact contact = contactDaoImpl.updateContactById(contactId);
-            boolean exit = true;
-            do {
-                System.out.println("Choose field which you would like to update: ");
-                System.out.println("1 - Name");
-                System.out.println("2 - Surname");
-                System.out.println("3 - Phone number");
-                System.out.println("0 - Done");
-                int numberOfMenu = scanner.nextInt();
-                switch (numberOfMenu) {
-                    case 1: {
-                        System.out.println("Updated contact's name:");
-                        contact.setName(scanner.next());
-                        break;
+
+    private Contact editContact(BufferedReader reader, Contact contact) throws AddressBookException, IOException {
+        boolean exit = true;
+        do {
+            System.out.println("Choose field which you would like to update: ");
+            System.out.println("1 - Name");
+            System.out.println("2 - Surname");
+            System.out.println("3 - Phone number");
+            System.out.println("4 - Age");
+            System.out.println("5 - Height");
+            System.out.println("6 - Marital status");
+            System.out.println("0 - Done");
+            String string = reader.readLine();
+            if (CommandLineService.isCorrectInteger(string)) {
+                //  String stringUpdate = reader.readLine();
+                int number = Integer.parseInt(string);
+                switch (number) {
+                    case ContactService.NAME: {
+                        return editField(1, contact, reader);
                     }
-                    case 2: {
-                        System.out.println("Updated contact's surname:");
-                        contact.setSurName(scanner.next());
-                        break;
+                    case ContactService.SUR_NAME: {
+                        return editField(2, contact, reader);
                     }
-                    case 3: {
-                        System.out.println("Updated contact's phone number:");
-                        contact.setPhoneNumber(scanner.next());
-                        break;
+                    case ContactService.PHONE_NUMBER: {
+                        return editField(3, contact, reader);
                     }
-                    case 0: {
-                        System.out.println("Updated contact: ");
-                        System.out.println(contact.toString());
-                        exit = false;
+                    case ContactService.AGE: {
+                        return editField(4, contact, reader);
+                    }
+                    case ContactService.HEIGHT: {
+                        return editField(5, contact, reader);
+                    }
+                    case ContactService.MARITAL_STATUS: {
+                        return editField(6, contact, reader);
+                    }
+                    case EXIT: {
+                        exit = true;
                         break;
                     }
                     default: {
                         System.out.println("Sorry, this number is not appropriate.");
-                    } } } while (exit);
-        }
+                    }
+                }
+            }
+        } while (exit);
+        return contact;
     }
 
-
+    private Contact editField(int numberOfField, Contact contact, BufferedReader reader)
+            throws AddressBookException, IOException {
+        System.out.println("Choose field which you would like to update: ");
+        String string = reader.readLine();
+        switch (numberOfField) {
+            case ContactService.NAME: {
+                contact.setName(string);
+                break;
+            }
+            case ContactService.SUR_NAME: {
+                contact.setSurName(string);
+                break;
+            }
+            case ContactService.PHONE_NUMBER: {
+                contact.setPhoneNumber(string);
+                break;
+            }
+            case ContactService.AGE: {
+                if (CommandLineService.isCorrectInteger(string)) {
+                    contact.setAge(Integer.parseInt(string));
+                }
+                break;
+            }
+            case ContactService.HEIGHT: {
+                if (CommandLineService.isCorrectDouble(string)) {
+                    contact.setHeight(Double.parseDouble(string));
+                }
+                break;
+            }
+            case ContactService.MARITAL_STATUS: {
+                contact.setMaritalStatus(Boolean.parseBoolean(string));
+                break;
+            }
+            default: {
+                System.out.println("123");
+            }
+        }
+        return contact;
+    }
 
     @Override
-    public void deleteContactById(Scanner scanner) throws AddressBookException {
-
-        if (contactDaoImpl.emptyStore()) {
-            throw new AddressBookException(ResponseCode.NO_CONTENT);
-
-        } else {
-            contactDaoImpl.showContacts();
-            System.out.println("Enter number of contact that will be deleted:");
-            int deleteId = scanner.nextInt();
-            contactDaoImpl.deleteContactById(deleteId);
-        }
+    public void deleteContactById(BufferedReader reader) throws AddressBookException, IOException {
+        contactDaoImpl.showContacts();
+        System.out.println("Enter number of contact that will be deleted:");
+        String string = reader.readLine();
+        int deleteId = Integer.parseInt(string);
+        contactDaoImpl.deleteContactById(deleteId);
     }
 
     @Override
@@ -121,127 +201,7 @@ public class ContactServiceImpl implements ContactService{
         contactDaoImpl.showContacts();
     }
 
-    @Override
-    public void deleteContactByEntity(Scanner scanner) throws AddressBookException {
-        if (contactDaoImpl.emptyStore()) {
-            throw new AddressBookException(ResponseCode.NO_CONTENT);
-
-        } else {
-            contactDaoImpl.showContacts();
-            System.out.println("Enter number of contact that will be deleted:");
-            contactDaoImpl.deleteContactByEntity(getContact(scanner));
-        }
-    }
-
-    //@Override
-   //public Contact updateContactById(Scanner scanner) throws AddressBookException {
-   //   // Contact contact = new Contact();
-   //   // if (Objects.isNull(getContact(scanner))) {
-   //   //     contact = getContactByName(scanner);
-   //   //     if (Objects.isNull(contact)) {
-   //   //         System.out.println("Contact not found");
-   //   //         System.out.println("Maybe you want to create rhis contact?\n1.Yes\n2.No");
-   //   //         if (scanner.hasNextInt()) {
-   //   //             int choosing = scanner.nextInt();
-   //   //             if (choosing == 1) {
-   //   //                 return addContact(scanner);
-   //   //             } else {
-   //   //                 return null;
-   //   //             }
-   //   //         }else {
-   //   //             System.out.println("Please enter a number");
-   //   //             scanner.next();
-   //   //         }
-   //   //
-   //   //     }
-   //   // }
-   //
-   //    if(contactDaoImpl.emptyStore()){
-   //        throw new AddressBookException(ResponseCode.NOT_FOUND);
-   //    } else {
-   //        contactDaoImpl.showContacts();
-   //        System.out.println("Please enter the number of Id of the contact you want to change");
-   //        int contactId = scanner.nextInt();
-   //        Contact contact = contactDaoImpl.updateContactById(contactId);
-   //        boolean exit = true;
-   //        do{
-   //            modifierFields(scanner, contact);
-   //
-   //
-   //        } while (exit);
-   //    }
-   //
-   //private Contact getContactByName(Scanner scanner) throws AddressBookException {
-   //    return contactDaoImpl.getContactByName(scanner.next());
-   //}
-   //
-
-   // @Override
-   // public void deleteContactByEntity(Scanner scanner) throws AddressBookException {
-   //     System.out.println("Enter number of contact for deleting:");
-   //     contactDaoImpl.deleteContactByEntity(getContact(scanner));
-   // }
-   //
-   // private void modifierFields(Scanner scanner, Contact contact); {
-   //     showFieldToModifier();
-   //     if (scanner.hasNextInt()) {
-   //
-   //         int number = scanner.nextInt();
-   //         switch (number) {
-   //             case ContactService.NAME: {
-   //                 System.out.println("Please update your contact's name: ");
-   //                 modifierOneField(ContactService.NAME, contact, scanner);
-   //                 break;;
-   //             }
-   //             case ContactService.SUR_NAME: {
-   //                 System.out.println("Please update your contact's surname: ");
-   //                 modifierOneField(ContactService.SUR_NAME, contact, scanner);
-   //                 break;
-   //             }
-   //             case ContactService.PHONE_NUMBER: {
-   //                 System.out.println("Please update your contact's phone number: ");
-   //                 modifierOneField(ContactService.PHONE_NUMBER, contact, scanner);
-   //                 break;;
-   //             }
-   //             default: {
-   //                 System.out.println("Sorry, nothing to change");
-   //             }
-   //         }
-   //     } else {
-   //         System.out.println("Please enter a number");
-   //         scanner.next();
-   //     }
-   // }
-
-   // private Contact modifierOneField(int field, Contact contact, Scanner scanner) {
-   //     System.out.println("Enter new value of the chosen field:");
-   //     String variable = scanner.next();
-   //     switch (field) {
-   //         case ContactService.NAME: {
-   //             contact.setName(variable);
-   //             break;
-   //         }
-   //         case ContactService.SUR_NAME: {
-   //             contact.setSurName(variable);
-   //             break;
-   //         }
-   //         case ContactService.PHONE_NUMBER: {
-   //             contact.setPhoneNumber(variable);
-   //             break;
-   //         }
-   //
-   //     }
-   //     System.out.println("Thank you for updating your contact.");
-   //     return contact;
-   // }
-
-//
-//    private void showFieldToModifier() {
-//        System.out.println("1.Name");
-//        System.out.println("2.Surname");
-//        System.out.println("3.Phone number");
-//        System.out.println("0.Exit without update");
-//    }
 
 }
+
 

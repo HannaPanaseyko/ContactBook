@@ -3,7 +3,8 @@ package service;
 import entity.Contact;
 import exception.AddressBookException;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public interface ContactService {
 
@@ -19,49 +20,48 @@ public interface ContactService {
      * Phone number parameter constant
      */
     int PHONE_NUMBER = 3;
+    /**
+     * Age parameter constant
+     */
+    int AGE = 4;
+    /**
+     * Height parameter constant
+     */
+    int HEIGHT = 5;
+    /**
+     * Marital status parameter constant
+     */
+    int MARITAL_STATUS = 6;
+    /**
+     * Exit parameter constant
+     */
+    int EXIT = 0;
 
     /**
      * Save created  contact in store.
      *
-     * @param scanner scanner of console input.
-     * @return contact that will be created.
+     * @param reader receive console input.
      */
 
-    Contact addContact(Scanner scanner) throws AddressBookException;
-
-    /**
-     * Return contact by id in address book
-     *
-     * @param scanner scanner of console input.
-     * @return searched contact
-     */
-    Contact getContact(Scanner scanner) throws AddressBookException;
+    void addContact(BufferedReader reader) throws AddressBookException, IOException;
 
     /**
      * Update contact .
      *
-     * @param scanner scanner of console input.
-     * @return updated contact
+     * @param reader receive console input.
      */
-    void updateContactById(Scanner scanner) throws AddressBookException;
+    Contact updateContactById(BufferedReader reader) throws AddressBookException, IOException;
 
     /**
      * Delete contact.
      *
-     * @param scanner scanner of console input.
+     * @param reader receive console input.
      */
-    void deleteContactById(Scanner scanner) throws AddressBookException;
+    void deleteContactById(BufferedReader reader) throws AddressBookException, IOException;
 
     /**
      * Show all contacts.
      */
-    void showContacts();
-
-    /**
-     * Delete contact by entity.
-     *
-     * @param scanner scanner of console input.
-     */
-    void deleteContactByEntity(Scanner scanner) throws AddressBookException;
+    void showContacts() throws AddressBookException;
 }
 

@@ -4,166 +4,117 @@ import dao.ContactDao;
 import entity.Contact;
 import exception.AddressBookException;
 import exception.ResponseCode;
-import org.omg.CORBA.portable.ApplicationException;
+import service.CommandLineService;
 
-import java.lang.reflect.Array;
-import java.util.Objects;
+import java.sql.*;
 
-public class ContactDaoImpl implements ContactDao {
+public class ContactDaoImpl extends DB implements ContactDao, CommandLineService {
   //  private static final Scanner searchID = new Scanner(System.in);
 
+    private Connection connection = DB.getConnect();
     private static int generator = 0;
-    private Contact[] store = new Contact[7];
 
     public ContactDaoImpl() {
 
     }
-   // private List<Contact> store = new ArrayList<>();
 
-    public void saveContact(Contact contact) throws AddressBookException {
-        searchSameContact(contact);
-        //contact.setId(store.size() + 1);
-        for (int argument = 0; argument <= store.length; argument++){
-            if(Objects.isNull(store[argument])){
-                generator = argument;
-                contact.setId(++generator);
-                store[argument] = contact;
-                System.out.println("This contact was added into your contact book");
-                System.out.println(contact.toString());
-                break;
-            }
+    public void saveContact(Contact contact){
+        try(PreparedStatement preparedStatement = connection.prepareStatement((INSERT_CONTACT))){
+            preparedStatement.setString(1, contact.getName());
+            preparedStatement.setString(2, contact.getSurName());
+            preparedStatement.setString(3, contact.getPhoneNumber());
+            preparedStatement.setInt(4, contact.getAge());
+            preparedStatement.setDouble(5, contact.getHeight());
+            preparedStatement.setBoolean(6, contact.getMaritalStatus());
+            preparedStatement.setTimestamp(7, contact.getCreateDate());
+            preparedStatement.execute();
+        }catch (SQLException e){
+            e.printStackTrace();
         }
-
-        //generator++;
-        //contact.setId(generator);
-        //store.add(contact);
-        //System.out.println("This contact was - = -");
-        //System.out.println(contact.toString());
     }
 
     @Override
-    public Contact updateContactById(int contactId)
-    {
-       // store.set(contact.getId()-1, contact);
-       // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
-       // return contact;
-
-        Contact contactStore = null;
-        for (Contact storeElement : store) {
-            if (Objects.equals(storeElement.getId(), contactId)){
-                 contactStore = storeElement;
-            break;
-            }
+    public void updateContactById(Contact contact){
+        try (PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CONTACT)) {
+            preparedStatement.setInt(1, contact.getId());
+            preparedStatement.setString(2, contact.getName());
+            preparedStatement.setString(3, contact.getSurName());
+            preparedStatement.setString(4, contact.getPhoneNumber());
+            preparedStatement.setInt(5, contact.getAge());
+            preparedStatement.setDouble(6, contact.getHeight());
+            preparedStatement.setBoolean(7, contact.getMaritalStatus());
+            preparedStatement.setInt(8, contact.getId());
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return contactStore;
     }
+
+
 
     @Override
-    public void showContacts() {
-        for(Contact contactStore : store){
-            if(Objects.nonNull(contactStore)){
-                System.out.println(contactStore);
-            }
-        }
-    }
-    @Override
-    public void deleteContactById(int contactId) throws AddressBookException {
-        if (idExists(contactId)){
-            throw new AddressBookException(ResponseCode.NO_CONTENT);
-        }
-        for(int parameter = 0; parameter < store.length; parameter++){
-            if (store[parameter].getId() == contactId){
-                store[parameter] = null;
-                break;
-            }
+    public void showContacts(){
+        try(Statement statement = connection.createStatement()){
+            statement.execute(SELECT_ALL);
+            ResultSet resultSet = statement.getResultSet();
+            while (resultSet.next()){
+                System.out.println(
+                         "ID: " + resultSet.getInt(1) + "  " +
+                         "NAME: " + resultSet.getString(2) + "  " +
+                         "SURNAME: " + resultSet.getString(3) + "  " +
+                         "PHONE NUMBER: " + resultSet.getString(4) + "  " +
+                         "AGE: " + resultSet.getInt(5) + "  " +
+                         "HEIGHT: " + resultSet.getDouble(6) + "  " +
+                         "MARITAL STATUS: " + resultSet.getBoolean(7) + "  " +
+                         "CREATE DATE: " + resultSet.getTimestamp(8));
 
+            }
+            }catch (SQLException e){
+                e.printStackTrace();
         }
-       // store.forEach(item -> {
-       //     if(item.getId())
-       // })
-    }
+        }
+
 
     @Override
-    public Contact getContactById(int contactId) throws AddressBookException{
-            if(idExists(contactId)) {
-                throw new AddressBookException(ResponseCode.NO_CONTENT);
-            }
-
-            for (Contact storeContacts : getStore()) {
-                if(storeContacts.getId() == contactId) {
-                    return storeContacts;
-                }
-            }
-            return null;
-    }
-    @Override
-    public Contact getContactByName(String name) {
-        for (Contact storeElement : store) {
-            if (Objects.equals(storeElement.getName().toLowerCase(), name.toLowerCase())) {
-                return storeElement;
-            }
+    public void deleteContactById(int contactId) {
+        try(PreparedStatement preparedStatement = connection.prepareStatement(DELETE_CONTACT)){
+            preparedStatement.setInt(1, contactId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e){
+            e.printStackTrace();
         }
-        return null;
     }
+
 
     @Override
-    public void deleteContactByEntity(Contact contact) {
-        for (int parameter = 0; parameter < store.length; parameter++) {
-            if (store[parameter].equals(contact)) {
-                store[parameter] = null;
-                break;
+    public Contact getContactById(int contactId) throws AddressBookException {
+        Contact updateContact = null;
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SELECT * " +
+                    "FROM contacts " +
+                    "WHERE id = " + contactId);
+            ResultSet resultSet = statement.getResultSet();
+            if (resultSet.next()) {
+                updateContact = new Contact();
+                updateContact.setId(resultSet.getInt(1));
+                updateContact.setName(resultSet.getString(2));
+                updateContact.setSurName(resultSet.getString(3));
+                updateContact.setPhoneNumber(resultSet.getString(4));
+                updateContact.setAge(resultSet.getInt(5));
+                updateContact.setHeight(resultSet.getDouble(6));
+                updateContact.setMaritalStatus(resultSet.getBoolean(7));
+                updateContact.setCreateDate(resultSet.getTimestamp(8));
+
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        if (updateContact == null) {
+            throw new AddressBookException(ResponseCode.NOT_FOUND);
+        } else {
+            return updateContact;
         }
     }
-
-    public Contact[] getStore(){
-        return store;
-    }
-
-    private void searchSameContact(Contact contact) throws AddressBookException {
-        for (Contact contactFromStore : getStore()) {
-            if (Objects.nonNull(contactFromStore)
-                    && contact.getName().equals(contactFromStore.getName())
-                    && contact.getPhoneNumber().equals(contactFromStore.getPhoneNumber())
-                    && contact.getSurName().equals(contactFromStore.getSurName())) {
-                throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-                        "This contact was added early");
-            }
-        }
-    }
-
-
-    //private void searchSameContact(Contact contact) throws AddressBookException{
-    //    for (Contact contactFromStore : getStore()){
-    //        if(Objects.nonNull(contactFromStore)
-    //                && contact.getName().equals(contact1.getName())
-    //                && contact.getPhoneNumber().equals(contact1.getPhoneNumber())
-    //                && contact.getSurName().equals(contact1.getSurName())){
-    //            throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-    //                    "This contact was added early");
-    //        }
-    //
-    //    }
-
-    public boolean idExists(int contactId) {
-        for(Contact contact : getStore()){
-            if (Objects.nonNull(contact)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean emptyStore(){
-        for(Contact contact : getStore()){
-            if (Objects.nonNull(contact)){
-                return false;
-            }
-        }
-        return true;
-    }
-
-
 }
 
 
