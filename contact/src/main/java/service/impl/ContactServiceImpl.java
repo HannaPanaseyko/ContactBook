@@ -50,8 +50,7 @@ public class ContactServiceImpl extends CommandLineServiceImpl implements Contac
         contact.setSurName(surName);
 
         System.out.println("Please enter your contact`s phone number");
-        String phoneNumber = reader.readLine().replaceAll("[^0-9+]", ""); //заменяем символы, которые
-        //не находятся между 0 и 9 и плюсом на пустоту(удаляем)
+        String phoneNumber = reader.readLine().replaceAll("[^0-9+]", ""); 
         contact.setPhoneNumber(phoneNumber);
 
 
