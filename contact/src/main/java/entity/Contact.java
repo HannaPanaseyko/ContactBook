@@ -56,5 +56,4 @@ public class Contact implements Comparable<Contact> {
     public int compareTo(Contact o) {
         return 0;
     }
-    // DAO data acsessed object
 }
