@@ -12,9 +12,6 @@ public interface CommandLineService {
      *
      */
 
-    // static final Scanner scanner = new Scanner(System.in);
-
-    //static final ContactServiceImpl service = new ContactServiceImpl(new ContactDaoImpl());
     static void showMenu() {
         //выводит взаимодействия
         System.out.println("1.Add contact.");
