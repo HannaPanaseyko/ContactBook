@@ -10,7 +10,6 @@ import java.lang.reflect.Array;
 import java.util.Objects;
 
 public class ContactDaoImpl implements ContactDao {
-  //  private static final Scanner searchID = new Scanner(System.in);
 
     private static int generator = 0;
     private Contact[] store = new Contact[7];
@@ -18,7 +17,6 @@ public class ContactDaoImpl implements ContactDao {
     public ContactDaoImpl() {
 
     }
-   // private List<Contact> store = new ArrayList<>();
 
     public void saveContact(Contact contact) throws AddressBookException {
         searchSameContact(contact);
@@ -33,21 +31,11 @@ public class ContactDaoImpl implements ContactDao {
                 break;
             }
         }
-
-        //generator++;
-        //contact.setId(generator);
-        //store.add(contact);
-        //System.out.println("This contact was - = -");
-        //System.out.println(contact.toString());
     }
 
     @Override
     public Contact updateContactById(int contactId)
     {
-       // store.set(contact.getId()-1, contact);
-       // Object[] ints = Stream.builder().add(1).add(2).build().toArray();
-       // return contact;
-
         Contact contactStore = null;
         for (Contact storeElement : store) {
             if (Objects.equals(storeElement.getId(), contactId)){
@@ -78,9 +66,6 @@ public class ContactDaoImpl implements ContactDao {
             }
 
         }
-       // store.forEach(item -> {
-       //     if(item.getId())
-       // })
     }
 
     @Override
@@ -131,19 +116,6 @@ public class ContactDaoImpl implements ContactDao {
             }
         }
     }
-
-
-    //private void searchSameContact(Contact contact) throws AddressBookException{
-    //    for (Contact contactFromStore : getStore()){
-    //        if(Objects.nonNull(contactFromStore)
-    //                && contact.getName().equals(contact1.getName())
-    //                && contact.getPhoneNumber().equals(contact1.getPhoneNumber())
-    //                && contact.getSurName().equals(contact1.getSurName())){
-    //            throw new AddressBookException(ResponseCode.OBJECT_EXIST,
-    //                    "This contact was added early");
-    //        }
-    //
-    //    }
 
     public boolean idExists(int contactId) {
         for(Contact contact : getStore()){
